@@ -147,11 +147,10 @@ resource "yandex_compute_instance" "private_vm" {
   }
 }
 
-# Storage object
+# Storage bucket
 
 resource "yandex_storage_bucket" "my-bucket" {
-  bucket     = var.bucket_name
-  acl        = "public-read"
+  bucket = var.bucket_name
 
   website {
     index_document = "index.html"
@@ -167,10 +166,10 @@ resource "yandex_storage_bucket" "my-bucket" {
 }
 
 resource "yandex_storage_object" "my-image" {
-  bucket     = yandex_storage_bucket.my-bucket.id
-  key        = "image.jpg"
-  source     = var.image_file_path
-  acl        = "public-read"
+  bucket = yandex_storage_bucket.my-bucket.id
+  key    = "image.jpg"
+  source = var.image_file_path
+  acl    = "public-read"
 
   depends_on = [
     yandex_storage_bucket.my-bucket
