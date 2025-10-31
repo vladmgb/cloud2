@@ -221,20 +221,12 @@ resource "yandex_compute_instance_group" "lamp-group" {
     }
 
     metadata = {
-      ssh-keys = "ubuntu:${file("~/.ssh/ubuntu.pub")}"
-      user-data = <<-EOF
-      #cloud-config
-      package_update: true
-      packages:
-        - apache2
-      runcmd:
-        - systemctl enable apache2
-        - systemctl start apache2
-        - echo '<!DOCTYPE html><html><head><title>LAMP Instance</title><style>body { font-family: Arial, sans-serif; margin: 40px; } img { max-width: 100%; }</style></head><body><h1>🚀 LAMP Instance Group</h1><p>Instance: {instance.index}</p><img src="${var.image_url}" alt="Image from Object Storage"><p><a href="${var.image_url}" target="_blank">Open original image</a></p></body></html>' > /var/www/html/index.html
-        - chown www-data:www-data /var/www/html/index.html
-        - systemctl restart apache2
-  EOF
-}
+    ssh-keys = "${var.vm_user}:${file(var.ssh_public_key_path)}"
+    user-data = templatefile("${path.module}/user-data.tftpl", {
+    web_page_title  = var.web_page_title
+    image_url       = var.image_url
+    })
+    }
 
     scheduling_policy {
       preemptible = true
@@ -248,7 +240,7 @@ resource "yandex_compute_instance_group" "lamp-group" {
   }
 
   allocation_policy {
-    zones = ["ru-central1-a"]
+    zones = [var.default_zone]
   }
 
   deploy_policy {
@@ -257,6 +249,7 @@ resource "yandex_compute_instance_group" "lamp-group" {
   }
 
   # Health Check
+
   health_check {
     timeout   = 3
     interval  = 5
@@ -268,48 +261,5 @@ resource "yandex_compute_instance_group" "lamp-group" {
       path = "/"
     }
   }
-
-  depends_on = [
-    yandex_storage_object.my-image
-  ]
 }
-
-resource "yandex_compute_instance" "lamp" {
-  name               = "lamp-instance"
-  folder_id          = var.folder_id
-  zone                = var.default_zone
-
-  resources {
-      memory = 2
-      cores  = 2
-      core_fraction = 5
-  }
-
-    boot_disk {
-
-      initialize_params {
-        image_id = "fd85i2h4n9msqf3e3jl4" # LAMP image
-        size     = 20
-        type     = "network-hdd"
-      }
-    }
-
-    network_interface {
-      subnet_id  = yandex_vpc_subnet.public.id            
-      nat        = true                              
-    }
-
-    metadata = {
-    ssh-keys = "${var.vm_user}:${file(var.ssh_public_key_path)}"
-    user-data = templatefile("${path.module}/user-data.tftpl", {
-    web_page_title  = var.web_page_title
-    web_page_styles = var.web_page_styles
-    image_url       = var.image_url
-    })
-    }
-
-    scheduling_policy {
-      preemptible = true
-    }
-  }
 

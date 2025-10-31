@@ -2,7 +2,6 @@ bucket_name        = "vladmgb-bucket-27102025"
 
 image_file_path    = "./image.jpg"
 image_url          = "https://storage.yandexcloud.net/vladmgb-bucket-27102025/image.jpg"
-web_page_title     = "LAMP Instance Group"
 
 instance_count     = 3
 

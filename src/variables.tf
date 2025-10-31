@@ -81,25 +81,14 @@ variable "vm_user" {
 variable "web_page_title" {
   description = "Title for the web page"
   type        = string
-  default     = "LAMP Instance Group"
+  default     = "Домашнее задание к занятию «Вычислительные мощности. Балансировщики нагрузки»"
 }
+
 
 variable "instance_count" {
   description = "Number of instances in the group"
   type        = number
   default     = 3
-}
-
-variable "web_page_styles" {
-  description = "CSS styles for the web page"
-  type        = string
-  default     = <<-EOT
-    body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
-    .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    h1 { color: #333; text-align: center; }
-    img { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #ddd; }
-    .info { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
-  EOT
 }
 
 variable "vm_resources" {
