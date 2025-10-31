@@ -50,7 +50,7 @@ variable "vpc_subnet_name_private" {
 
 variable "bucket_name" {
   type        = string
-  default     = "vladmgb_bucket_27102025"
+  default     = "vladmgb-bucket-27102025"
   description = "Name of the Object Storage bucket"
 }
 
@@ -58,4 +58,53 @@ variable "image_file_path" {
   type        = string
   default     = "./image.jpg"
   description = "Path to the image file"
+}
+
+variable "image_url" {
+  description = "Public URL of the image in Object Storage"
+  type        = string
+  default     = "https://storage.yandexcloud.net/vladmgb-bucket-2710202/image.jpg"
+}
+
+variable "user_data_template" {
+  description = "User data template for VM initialization"
+  type        = string
+  default     = <<-EOT
+    #cloud-config
+    package_update: true
+    packages:
+      - apache2
+    write_files:
+    - path: /var/www/html/index.html
+      owner: www-data:www-data
+      permissions: '0644'
+      content: |
+        <!DOCTYPE html>
+        <html lang="ru">
+        <head>
+            <meta charset="UTF-8">
+            <title>${web_page_title}</title>
+            <style>${web_page_styles}</style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>${web_page_title}</h1>
+                <div class="info">
+                    <p><strong>Instance:</strong> $(hostname)</p>
+                    <p><strong>Image URL:</strong> ${image_url}</p>
+                </div>
+                <div style="text-align: center;">
+                    <a href="${image_url}" target="_blank">
+                        <img src="${image_url}" alt="Image from Object Storage">
+                    </a>
+                    <p><a href="${image_url}" target="_blank">📎 Открыть изображение в новой вкладке</a></p>
+                </div>
+            </div>
+        </body>
+        </html>
+    runcmd:
+      - systemctl enable apache2
+      - systemctl start apache2
+      - systemctl restart apache2
+  EOT
 }
