@@ -66,45 +66,52 @@ variable "image_url" {
   default     = "https://storage.yandexcloud.net/vladmgb-bucket-2710202/image.jpg"
 }
 
-variable "user_data_template" {
-  description = "User data template for VM initialization"
+variable "ssh_public_key_path" {
+  description = "Path to SSH public key file"
+  type        = string
+  default     = "~/.ssh/ubuntu.pub"
+}
+
+variable "vm_user" {
+  description = "Username for VM access"
+  type        = string
+  default     = "ubuntu"
+}
+
+variable "web_page_title" {
+  description = "Title for the web page"
+  type        = string
+  default     = "LAMP Instance Group"
+}
+
+variable "instance_count" {
+  description = "Number of instances in the group"
+  type        = number
+  default     = 3
+}
+
+variable "web_page_styles" {
+  description = "CSS styles for the web page"
   type        = string
   default     = <<-EOT
-    #cloud-config
-    package_update: true
-    packages:
-      - apache2
-    write_files:
-    - path: /var/www/html/index.html
-      owner: www-data:www-data
-      permissions: '0644'
-      content: |
-        <!DOCTYPE html>
-        <html lang="ru">
-        <head>
-            <meta charset="UTF-8">
-            <title>${web_page_title}</title>
-            <style>${web_page_styles}</style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>${web_page_title}</h1>
-                <div class="info">
-                    <p><strong>Instance:</strong> $(hostname)</p>
-                    <p><strong>Image URL:</strong> ${image_url}</p>
-                </div>
-                <div style="text-align: center;">
-                    <a href="${image_url}" target="_blank">
-                        <img src="${image_url}" alt="Image from Object Storage">
-                    </a>
-                    <p><a href="${image_url}" target="_blank">📎 Открыть изображение в новой вкладке</a></p>
-                </div>
-            </div>
-        </body>
-        </html>
-    runcmd:
-      - systemctl enable apache2
-      - systemctl start apache2
-      - systemctl restart apache2
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+    .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h1 { color: #333; text-align: center; }
+    img { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #ddd; }
+    .info { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
   EOT
+}
+
+variable "vm_resources" {
+  description = "VM resources configuration"
+  type = object({
+    memory = number
+    cores  = number
+    core_fraction = number
+  })
+  default = {
+    memory = 2
+    cores  = 2
+    core_fraction = 5
+  }
 }

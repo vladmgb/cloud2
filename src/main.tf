@@ -190,7 +190,6 @@ resource "yandex_resourcemanager_folder_iam_member" "vm-sa-role" {
   member    = "serviceAccount:${yandex_iam_service_account.vm-sa.id}"
 }
 
-
 resource "yandex_compute_instance_group" "lamp-group" {
   name               = "lamp-instance-group-new"
   folder_id          = var.folder_id
@@ -202,9 +201,9 @@ resource "yandex_compute_instance_group" "lamp-group" {
     name        = "lamp-vm-{instance.index}" 
     hostname    = "lamp-vm-{instance.index}" 
     resources {
-      memory = 2
-      cores  = 2
-      core_fraction = 5
+      memory = var.vm_resources.memory
+      cores  = var.vm_resources.cores
+      core_fraction = var.vm_resources.core_fraction
     }
 
     boot_disk {
@@ -275,14 +274,10 @@ resource "yandex_compute_instance_group" "lamp-group" {
   ]
 }
 
-
-
-
 resource "yandex_compute_instance" "lamp" {
   name               = "lamp-instance"
   folder_id          = var.folder_id
   zone                = var.default_zone
-  
 
   resources {
       memory = 2
@@ -305,49 +300,13 @@ resource "yandex_compute_instance" "lamp" {
     }
 
     metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/ubuntu.pub")}"
-    user-data = <<-EOF
-    #cloud-config
-    write_files:
-    - path: /var/www/html/index.html
-      owner: www-data:www-data
-      permissions: '0644'
-      content: |
-        <!DOCTYPE html>
-        <html lang="ru">
-        <head>
-            <meta charset="UTF-8">
-            <title>LAMP Instance</title>
-            <style>
-                body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
-                .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                h1 { color: #333; text-align: center; }
-                img { max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #ddd; }
-                .info { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>LAMP Instance Group</h1>
-                <div class="info">
-                    <p><strong>Instance:</strong> $(hostname)</p>
-                    <p><strong>Image URL:</strong> https://storage.yandexcloud.net/vladmgb-bucket-27102025/image.jpg</p>
-                </div>
-                <div style="text-align: center;">
-                    <a href="https://storage.yandexcloud.net/vladmgb-bucket-27102025/image.jpg" target="_blank">
-                        <img src="https://storage.yandexcloud.net/vladmgb-bucket-27102025/image.jpg" alt="Image from Object Storage">
-                    </a>
-                    <p><a href="https://storage.yandexcloud.net/vladmgb-bucket-27102025/image.jpg" target="_blank">📎 Открыть изображение в новой вкладке</a></p>
-                </div>
-            </div>
-        </body>
-        </html>
-    runcmd:
-      - systemctl enable apache2
-      - systemctl start apache2
-      - systemctl restart apache2
-  EOF
-  }
+    ssh-keys = "${var.vm_user}:${file(var.ssh_public_key_path)}"
+    user-data = templatefile("${path.module}/user-data.tftpl", {
+    web_page_title  = var.web_page_title
+    web_page_styles = var.web_page_styles
+    image_url       = var.image_url
+    })
+    }
 
     scheduling_policy {
       preemptible = true
