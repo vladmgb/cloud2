@@ -263,3 +263,157 @@ resource "yandex_compute_instance_group" "lamp-group" {
   }
 }
 
+# Network load balancer
+
+data "yandex_compute_instance_group" "current" {
+  instance_group_id = yandex_compute_instance_group.lamp-group.id
+}
+
+# Target Group с актуальными IP
+resource "yandex_lb_target_group" "lamp-target-group" {
+  name      = "lamp-target-group"
+  region_id = "ru-central1"
+
+  dynamic "target" {
+    for_each = data.yandex_compute_instance_group.current.instances
+    content {
+      subnet_id = yandex_vpc_subnet.public.id
+      address   = target.value.network_interface[0].ip_address
+    }
+  }
+}
+
+resource "yandex_lb_network_load_balancer" "lamp-balancer" {
+  name        = "lamp-network-balancer"
+  description = "Network Load Balancer for LAMP"
+
+  listener {
+    name = "http-listener"
+    port = 80
+    external_address_spec {
+      ip_version = "ipv4"
+    }
+  }
+
+  attached_target_group {
+    target_group_id = yandex_lb_target_group.lamp-target-group.id
+
+    healthcheck {
+      name = "http-healthcheck"
+      timeout = 10
+      interval = 15
+      healthy_threshold   = 2
+      unhealthy_threshold = 3
+      http_options {
+        port = 80
+        path = "/"
+      }
+    }
+  }
+}
+
+#!!!!!!!!!!!
+
+
+#########################
+# Application Load Balancer
+#########################
+
+# ALB Target Group (правильный синтаксис)
+resource "yandex_alb_target_group" "lamp_alb_target_group" {
+  name = "lamp-alb-target-group"
+
+  target {
+    subnet_id  = yandex_vpc_subnet.public.id
+    ip_address = data.yandex_compute_instance_group.current.instances[0].network_interface[0].ip_address
+  }
+
+  target {
+    subnet_id  = yandex_vpc_subnet.public.id
+    ip_address = data.yandex_compute_instance_group.current.instances[1].network_interface[0].ip_address
+  }
+
+  target {
+    subnet_id  = yandex_vpc_subnet.public.id
+    ip_address = data.yandex_compute_instance_group.current.instances[2].network_interface[0].ip_address
+  }
+}
+
+# ALB Backend Group
+resource "yandex_alb_backend_group" "lamp_backend_group" {
+  name = "lamp-backend-group"
+
+  http_backend {
+    name   = "lamp-http-backend"
+    weight = 1
+    port   = 80
+
+    # Правильное подключение через Target Group
+    target_group_ids = [yandex_alb_target_group.lamp_alb_target_group.id]
+
+    healthcheck {
+      timeout             = "10s"
+      interval            = "15s"
+      healthy_threshold   = 2
+      unhealthy_threshold = 2
+      http_healthcheck {
+        path = "/"
+      }
+    }
+
+    load_balancing_config {
+      panic_threshold = 50
+    }
+  }
+}
+
+# HTTP Router
+resource "yandex_alb_http_router" "lamp_router" {
+  name        = "lamp-router"
+  description = "HTTP Router for LAMP application"
+}
+
+# Virtual Host
+resource "yandex_alb_virtual_host" "lamp_virtual_host" {
+  name           = "lamp-virtual-host"
+  http_router_id = yandex_alb_http_router.lamp_router.id
+
+  route {
+    name = "lamp-route"
+    http_route {
+      http_route_action {
+        backend_group_id = yandex_alb_backend_group.lamp_backend_group.id
+        timeout          = "60s"
+      }
+    }
+  }
+}
+
+# ALB Load Balancer
+resource "yandex_alb_load_balancer" "lamp_app_balancer" {
+  name        = "lamp-app-balancer"
+  description = "Application Load Balancer for LAMP Instance Group"
+  network_id  = yandex_vpc_network.netology.id
+
+  allocation_policy {
+    location {
+      zone_id   = var.default_zone
+      subnet_id = yandex_vpc_subnet.public.id
+    }
+  }
+
+  listener {
+    name = "lamp-http-listener"
+    endpoint {
+      address {
+        external_ipv4_address {}
+      }
+      ports = [80]
+    }
+    http {
+      handler {
+        http_router_id = yandex_alb_http_router.lamp_router.id
+      }
+    }
+  }
+}

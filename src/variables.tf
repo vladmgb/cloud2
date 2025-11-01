@@ -104,3 +104,9 @@ variable "vm_resources" {
     core_fraction = 5
   }
 }
+
+variable "region" {
+  description = "Yandex.Cloud region"
+  type        = string
+  default     = "ru-central1"
+}
