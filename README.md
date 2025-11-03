@@ -44,11 +44,7 @@
 <img width="1067" height="254" alt="image" src="https://github.com/user-attachments/assets/7e5fa5d4-7f12-42eb-a64d-1ef18fad15af" />
 <br>
 <br>
-Странички с картинкой доступны:
-[http://158.160.123.3](http://158.160.123.3)
-[http://84.201.159.30](http://84.201.159.30)
-[http://89.169.153.249](http://89.169.153.249)
-
+Странички с картинкой доступны на всех ВМ группы.
 
 3. Подключить группу к сетевому балансировщику:
    
@@ -74,15 +70,17 @@
 Удалена 1 ВМ.
 <br>
 <br>
-<img width="692" height="493" alt="image" src="https://github.com/user-attachments/assets/703e3494-8fb9-4b30-914e-12e0fbc8e46d" />
+<img width="606" height="425" alt="image" src="https://github.com/user-attachments/assets/aae3f6f3-2a3c-4de0-b559-cefd5f8a2537" />
 <br>
 <br>
 Удалены 2 ВМ
 <br>
 <br>
-<img width="632" height="497" alt="image" src="https://github.com/user-attachments/assets/6b0e5d51-2423-4156-b598-02e50291d42f" />
+<img width="556" height="433" alt="image" src="https://github.com/user-attachments/assets/de6e3c2b-4157-48db-968f-2249571baf9e" />
+<br>
+<br>
 
-Страничка с картинкой через NLB все также доступна: [http://158.160.175.72/](http://158.160.175.72/)
+Страничка с картинкой через NLB все также доступна: [http://158.160.175.72](http://158.160.175.72)
 
 - (дополнительно)* Создать Application Load Balancer с использованием Instance group и проверкой состояния.
 <br>
@@ -90,7 +88,7 @@
 <img width="727" height="589" alt="image" src="https://github.com/user-attachments/assets/7b7e8ab0-a257-469f-a436-51efe3862272" />
 <br>
 <br>
-Странички с картинкой через ALB доступна: [http://158.160.189.64/](http://158.160.189.64/)
+Странички с картинкой через ALB доступна: [http://158.160.189.64](http://158.160.189.64)
 <br>
 <br>
 <img width="888" height="522" alt="image" src="https://github.com/user-attachments/assets/2e9a1ec7-a55f-41be-95f3-d9a6c24b96c7" />
