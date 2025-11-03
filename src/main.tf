@@ -269,7 +269,6 @@ data "yandex_compute_instance_group" "current" {
   instance_group_id = yandex_compute_instance_group.lamp-group.id
 }
 
-# Target Group с актуальными IP
 resource "yandex_lb_target_group" "lamp-target-group" {
   name      = "lamp-target-group"
   region_id = "ru-central1"
@@ -312,14 +311,9 @@ resource "yandex_lb_network_load_balancer" "lamp-balancer" {
   }
 }
 
-#!!!!!!!!!!!
 
-
-#########################
 # Application Load Balancer
-#########################
 
-# ALB Target Group (правильный синтаксис)
 resource "yandex_alb_target_group" "lamp_alb_target_group" {
   name = "lamp-alb-target-group"
 
@@ -339,7 +333,6 @@ resource "yandex_alb_target_group" "lamp_alb_target_group" {
   }
 }
 
-# ALB Backend Group
 resource "yandex_alb_backend_group" "lamp_backend_group" {
   name = "lamp-backend-group"
 
@@ -348,7 +341,6 @@ resource "yandex_alb_backend_group" "lamp_backend_group" {
     weight = 1
     port   = 80
 
-    # Правильное подключение через Target Group
     target_group_ids = [yandex_alb_target_group.lamp_alb_target_group.id]
 
     healthcheck {
@@ -367,13 +359,12 @@ resource "yandex_alb_backend_group" "lamp_backend_group" {
   }
 }
 
-# HTTP Router
 resource "yandex_alb_http_router" "lamp_router" {
   name        = "lamp-router"
   description = "HTTP Router for LAMP application"
 }
 
-# Virtual Host
+
 resource "yandex_alb_virtual_host" "lamp_virtual_host" {
   name           = "lamp-virtual-host"
   http_router_id = yandex_alb_http_router.lamp_router.id
@@ -389,10 +380,9 @@ resource "yandex_alb_virtual_host" "lamp_virtual_host" {
   }
 }
 
-# ALB Load Balancer
 resource "yandex_alb_load_balancer" "lamp_app_balancer" {
   name        = "lamp-app-balancer"
-  description = "Application Load Balancer for LAMP Instance Group"
+  description = "Application Load Balancer for LAMP"
   network_id  = yandex_vpc_network.netology.id
 
   allocation_policy {
