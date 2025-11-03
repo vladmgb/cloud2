@@ -147,7 +147,7 @@ resource "yandex_compute_instance" "private_vm" {
   }
 }
 
-# Object Storage
+###### Object Storage
 
 resource "yandex_storage_bucket" "my-bucket" {
   bucket = var.bucket_name
@@ -177,7 +177,7 @@ resource "yandex_storage_object" "my-image" {
 }
 
 
-# Instance Group
+####### Instance Group
 
 resource "yandex_iam_service_account" "vm-sa" {
   name        = "vm-service-account"
@@ -248,8 +248,6 @@ resource "yandex_compute_instance_group" "lamp-group" {
     max_expansion   = 0
   }
 
-  # Health Check
-
   health_check {
     timeout   = 3
     interval  = 5
@@ -263,7 +261,7 @@ resource "yandex_compute_instance_group" "lamp-group" {
   }
 }
 
-# Network load balancer
+####### Network load balancer
 
 data "yandex_compute_instance_group" "current" {
   instance_group_id = yandex_compute_instance_group.lamp-group.id
@@ -312,7 +310,7 @@ resource "yandex_lb_network_load_balancer" "lamp-balancer" {
 }
 
 
-# Application Load Balancer
+###### Application Load Balancer
 
 resource "yandex_alb_target_group" "lamp_alb_target_group" {
   name = "lamp-alb-target-group"
