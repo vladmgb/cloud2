@@ -57,7 +57,7 @@
 <img width="873" height="616" alt="image" src="https://github.com/user-attachments/assets/89937817-1fea-4bc2-b4b1-ed47f5622d66" />
 <br>
 <br>
-Странички с картинкой через NLB доступна: [http://158.160.175.72/](http://158.160.175.72/)
+Странички с картинкой через NLB доступна:http://158.160.175.72
 <br>
 <br>
 <img width="880" height="576" alt="image" src="https://github.com/user-attachments/assets/9de6fb08-90ec-4c27-a470-92e16b8133cf" />
@@ -80,7 +80,7 @@
 <br>
 <br>
 
-Страничка с картинкой через NLB все также доступна: [http://158.160.175.72](http://158.160.175.72)
+Страничка с картинкой через NLB все также доступна: http://158.160.175.72
 
 - (дополнительно)* Создать Application Load Balancer с использованием Instance group и проверкой состояния.
 <br>
@@ -88,7 +88,7 @@
 <img width="727" height="589" alt="image" src="https://github.com/user-attachments/assets/7b7e8ab0-a257-469f-a436-51efe3862272" />
 <br>
 <br>
-Странички с картинкой через ALB доступна: [http://158.160.189.64](http://158.160.189.64)
+Странички с картинкой через ALB доступна: http://158.160.189.64
 <br>
 <br>
 <img width="888" height="522" alt="image" src="https://github.com/user-attachments/assets/2e9a1ec7-a55f-41be-95f3-d9a6c24b96c7" />
